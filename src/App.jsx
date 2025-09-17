@@ -10,6 +10,12 @@ function App() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [category, setCategory] = useState("");
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const recipePerPage = 6;
+
+  const indexOfLastRecipe = currentPage * recipePerPage;
+  const indexOfFirstRecipe = currentPage - recipePerPage;
+  const currentRecipes = recipes.slice(indexOfFirstRecipe, indexOfLastRecipe);
   const [favorites, setFavorites] = useState(() => {
     const saved = localStorage.getItem("favoritesRecipes");
     return saved ? JSON.parse(saved) : [];
@@ -105,8 +111,8 @@ function App() {
 
         {/* Search Results */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
-          {recipes.length > 0
-            ? recipes.map((recipe) => (
+          {currentRecipes.length > 0
+            ? currentRecipes.map((recipe) => (
                 <div
                   key={recipe.idMeal}
                   className="bg-white p-4 rounded shadow cursor-pointer relative"
@@ -136,6 +142,34 @@ function App() {
                   Search for recipes using the above search bar
                 </p>
               )}
+        </div>
+
+        {/* pagination button */}
+
+        <div className="flex justify-center items-center space-x-4 my-4">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded  disabled:opacity-50"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span>page {currentPage}</span>
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
+            onClick={() =>
+              setCurrentPage((prev) =>
+                prev < Math.ceil(recipes.length / recipesPerPage)
+                  ? prev + 1
+                  : prev
+              )
+            }
+            disabled={
+              currentPage === Math.ceil(recipes.length / recipesPerPage)
+            }
+          >
+            Next
+          </button>
         </div>
 
         {/* ⭐️ Favorite Recipes Section */}
